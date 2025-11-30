@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ULTRA Home Adventskalender</title>
+<style>
+  /* Basis */
+  body, html {
+    margin:0; padding:0; height:100%;
+    background: url('Schnee.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family:'Pacifico', cursive;
+    color:#fff;
+    overflow-x:hidden;
+    cursor:none;
+  }
+
+header {
+text-align:center;
+font-size:2rem;
+margin:20px 0;
+color:#0ff;
+text-shadow:0 0 10px #0ff,0 0 20px #0ff;
+}
+
+#time { font-size:1.2rem; margin-top:5px; color:#f0f; text-shadow:0 0 8px #f0f,0 0 15px #f0f;}
+
+/* Kalender */
+.calendar {
+display:grid;
+grid-template-columns:repeat(6,1fr);
+grid-gap:15px;
+max-width:1200px;
+margin:0 auto;
+padding:20px;
+perspective:1000px;
+}
+
+.door {
+width:100%; height:120px;
+perspective:600px;
+position:relative;
+}
+
+.door-inner {
+width:100%; height:100%;
+transition: transform 0.6s;
+transform-style: preserve-3d;
+position:relative;
+}
+
+.door.opened .door-inner {
+transform: rotateY(180deg);
+}
+
+.front, .back {
+position:absolute; width:100%; height:100%; backface-visibility:hidden; display:flex; justify-content:center; align-items:center;
+border-radius:10px; font-size:2rem;
+}
+
+.front {
+background: rgba(17,17,17,0.85);
+color:#0ff; border:3px solid #0ff;
+transition: box-shadow 0.3s;
+}
+.front:hover {
+box-shadow:0 0 30px #0ff,0 0 60px #0ff inset;
+color:#ff0;
+text-shadow:0 0 8px #ff0,0 0 15px #ff0;
+cursor:pointer;
+}
+
+.back {
+background: rgba(34,34,34,0.85);
+color:#fff; border:3px solid #f0f;
+transform: rotateY(180deg);
+font-size:1rem; padding:5px; text-align:center;
+}
+
+.locked .front {
+opacity:0.5;
+cursor:not-allowed;
+}
+
+/* Schneeflocken */
+.snowflake { position:absolute; top:-2em; color:#fff; font-size:1em; user-select:none; pointer-events:none; opacity:0.8; animation-name:fall; animation-timing-function:linear; }
+@keyframes fall { 0%{transform:translateY(0) rotate(0deg);} 100%{transform:translateY(110vh) rotate(360deg);} }
+
+/* Neon-Mauszeiger */
+#cursor { position:fixed; top:0; left:0; width:20px; height:20px; border-radius:50%; pointer-events:none; z-index:9999; mix-blend-mode:screen; box-shadow:0 0 10px #0ff,0 0 20px #0ff,0 0 30px #f0f; transition: transform 0.1s; }
+.trail { position:fixed; top:0; left:0; width:10px; height:10px; border-radius:50%;
+background:linear-gradient(45deg,#ff0,#0ff,#f0f);
+pointer-events:none; opacity:0.6; mix-blend-mode:screen; z-index:9998;
+animation: fade 0.5s forwards;
+}
+@keyframes fade { to { opacity:0; transform:scale(2); } }
+
+@media(max-width:768px){ .calendar {grid-template-columns:repeat(4,1fr);} .front, .back{font-size:1.5rem; height:100px;} }
+
+/* ULTRA Neon Hologram Spruch unten */
+#dailyNeon {
+position: fixed;
+bottom: 25px;
+left: 50%;
+transform: translateX(-50%) rotateX(25deg) translateZ(60px);
+padding: 15px 50px;
+font-size: 1.6rem;
+font-family: 'Pacifico', cursive;
+font-weight: bold;
+color: #fff;
+background: linear-gradient(120deg, rgba(0,255,255,0.2), rgba(255,0,255,0.2), rgba(255,255,0,0.2));
+backdrop-filter: blur(8px);
+border-radius: 30px;
+border: 2px solid rgba(0,255,255,0.8);
+box-shadow: 0 0 15px #0ff,0 0 25px #0ff,0 0 40px #f0f,0 0 70px #ff0 inset;
+text-shadow: 0 0 15px #0ff,0 0 25px #0ff,0 0 35px #f0f,0 0 20px #ff0,0 0 50px #0ff;
+pointer-events: none;
+z-index: 999999;
+overflow: hidden;
+animation: rgbShift 4s infinite alternate ease-in-out, neonPulse 2.5s infinite ease-in-out, scanline 6s infinite linear;
+}
+#dailyNeon::after {
+content: "";
+position: absolute;
+top: 0;
+left: -150%;
+width: 120%;
+height: 100%;
+background: linear-gradient(75deg, transparent 40%, rgba(255,255,255,0.5) 50%, transparent 60%);
+animation: shine 5s infinite ease-in-out;
+pointer-events: none;
+}
+@keyframes rgbShift {0%{filter:drop-shadow(0 0 3px #0ff);}20%{filter:drop-shadow(0 0 6px #f0f);}50%{filter:drop-shadow(0 0 12px #ff0);}80%{filter:drop-shadow(0 0 8px #0ff);}100%{filter:drop-shadow(0 0 3px #f0f);}}
+@keyframes neonPulse {0%{transform:translateX(-50%) rotateX(25deg) scale(1);opacity:0.85;}50%{transform:translateX(-50%) rotateX(25deg) scale(1.08);opacity:1;}100%{transform:translateX(-50%) rotateX(25deg) scale(1);opacity:0.9;}}
+@keyframes shine {0%{left:-150%;}50%{left:150%;}100%{left:-150%;}}
+@keyframes scanline {0%{opacity:1;}45%{opacity:0.95;}46%{opacity:0.6;}47%{opacity:1;}100%{opacity:1;}}
+
+/* Partikel-Overlay */
+#neonParticles { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999998; mix-blend-mode: screen; } </style>
+
+</head>
+<body>
+
+<header>
+  ULTRA Home Adventskalender
+  <div id="time"></div>
+</header>
+
+<div class="calendar" id="calendar"></div>
+
+<div id="cursor"></div>
+<div id="dailyNeon"></div>
+<canvas id="neonParticles"></canvas>
+
+<audio id="bgMusic" src="snow.mp3" autoplay loop></audio>
+
+<script>
+const adventYear = 2025;
+
+// Uhrzeit
+function updateTime(){
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('de-DE');
+  const dateStr = now.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('time').textContent = `${dateStr} - ${timeStr}`;
+}
+setInterval(updateTime,1000);
+updateTime();
+
+// Adventssprüche für Türen
+const doorContents=[
+"✨ Advent ist da! Heute ein Lächeln für dich.","💌 Liebe Grüße und ein warmes Herz für dich.","🎄 Genieße die kleinen Wunder des Advents!","❄️ Schneeflocken im Herzen – du bist wundervoll.","🕯️ Kerzenschein & frohe Stunden.","☕ Heiße Schokolade & Kuscheldecke.","🎶 Adventsmusik für deine Seele.","💖 Heute ein kleiner Liebesgruß.","🌟 Funkelnde Momente für dich.","🍪 Nasch dir Freude, es ist Advent!","🎉 Lächle, jemand denkt an dich!","🎀 Ruhe & Freude für diesen Tag.","❄️ Winterzauber und warme Gedanken.","✨ Ein Funke Glück für dein Herz.","🎄 Verschenke heute ein Lächeln.","🕯️ Frieden & Liebe im Advent.","☕ Kuschelzeit & warme Momente.","💌 Schicke Liebe in die Welt.","🌟 Magische Adventsmomente für dich.","🍪 Süßer Gruß für einen tollen Tag.","🎉 Kleine Freude – großes Glück.","🎀 Sei heute fröhlich & leicht.","❄️ Bau einen Schneemann im Herzen.","✨ Funken der Liebe und Freude."
+];
+
+let openedDoors = JSON.parse(localStorage.getItem('openedDoors') || "[]");
+
+const now = new Date();
+let todayDay = 0;
+if(now.getFullYear() === adventYear && now.getMonth() === 11){
+  todayDay = now.getDate();
+}
+
+// Kalender generieren
+const calendar = document.getElementById('calendar');
+for(let i=1; i<=24; i++){
+  const door = document.createElement('div');
+  door.classList.add('door');
+  door.innerHTML = `<div class="door-inner">
+    <div class="front">${i}</div>
+    <div class="back">${doorContents[i-1]}</div>
+  </div>`;
+  if(openedDoors.includes(i)) door.classList.add('opened');
+  if(i > todayDay) door.classList.add('locked');
+  door.addEventListener('click', ()=>{
+    if(door.classList.contains('locked')) return;
+    if(!openedDoors.includes(i)){
+      door.classList.add('opened');
+      openedDoors.push(i);
+      localStorage.setItem('openedDoors', JSON.stringify(openedDoors));
+    }
+  });
+  calendar.appendChild(door);
+}
+
+// Schneeflocken
+function createSnow(){
+  const snow = document.createElement('div');
+  snow.classList.add('snowflake');
+  snow.style.left = Math.random()*100+'vw';
+  snow.style.fontSize = (10+Math.random()*10)+'px';
+  snow.style.animationDuration = (5+Math.random()*5)+'s';
+  snow.textContent = '❄️';
+  document.body.appendChild(snow);
+  setTimeout(()=>snow.remove(),10000);
+}
+setInterval(createSnow,200);
+
+// Neon Cursor
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e=>{
+  cursor.style.transform = `translate(${e.clientX-10}px,${e.clientY-10}px)`;
+  const trail = document.createElement('div');
+  trail.classList.add('trail');
+  trail.style.left = e.clientX+'px';
+  trail.style.top = e.clientY+'px';
+  document.body.appendChild(trail);
+  setTimeout(()=>trail.remove(),500);
+});
+
+// Musik
+const music = document.getElementById('bgMusic');
+music.volume = 0.3;
+
+// ULTRA Spruch unten
+const neonTexts = [
+"⚡ Heute: Glow-Level jenseits der Realität.","🔥 Du brennst heller als jede Winterbeleuchtung.","🌌 Halb Mensch, halb Neonröhre.","🌈 Dein Shadow hat heute RGB.","💥 Keine Ausreden – nur Ausstrahlung.","✨ Wenn du auftauchst, flackern die Lampen.","❄️ Frostig draußen – aber du bist der Laser.","🌀 Heute: Hologramm-Version von dir online.","🔥 Zu kalt? Nein. Zu heiß!","⚡ Dein Mood hat heute Lichteffekte.","💎 Du reflektierst jeden Sternenhimmel.","🎇 Funkenflug-Modus aktiviert.","🪩 Wenn es glitzert: du warst da.","🌟 Du wirst heute nicht gesehen – du wirst GESPÜRT.","🚀 Neon trifft auf Magie. Das bist du heute.","🧊 Cool genug, um Schnee zu schmelzen.","🔥 Heute keine Schatten – nur Leuchten.","🎆 Deine Aura hat heute 120 FPS.","⚡ Stromkosten? Egal, du bist der Generator.","🌌 Universe glow detected.","💥 Zu hell, um ignoriert zu werden.","🔥 Winter? Du bist der Kernreaktor.","✨ Endboss-Modus online.","🌈 Tag 24: MAXIMUM OVERGLOW."
+];
+const dayIndex = now.getDate()-1;
+const neonEl = document.getElementById("dailyNeon");
+neonEl.textContent = (dayIndex>=0&&dayIndex<24)? neonTexts[dayIndex]:"✨ Advent incoming…";
+
+// Maus Interaktion für Hologram
+document.addEventListener("mousemove", e=>{
+  const x = (e.clientX / window.innerWidth -0.5)*30;
+  const y = (e.clientY / window.innerHeight -0.5)*15;
+  neonEl.style.transform = `translateX(-50%) rotateX(${25+y}deg) rotateY(${x}deg) translateZ(60px) scale(1.08)`;
+});
+
+// ULTRA Partikel
+const canvas = document.getElementById("neonParticles");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let particles = [];
+for(let i=0;i<150;i++){
+  particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,size:Math.random()*3+1,speed:Math.random()*1.5+0.5,angle:Math.random()*360});
+}
+function animateParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.y += p.speed;
+    p.x += Math.sin(p.angle)*0.5;
+    p.angle+=0.02;
+    if(p.y>canvas.height)p.y=0;
+    if(p.x>canvas.width)p.x=0;
+    ctx.fillStyle = `rgba(0,255,255,${Math.random()})`;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+    ctx.fill();
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+window.addEventListener('resize', ()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
